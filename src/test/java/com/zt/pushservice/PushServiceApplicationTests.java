@@ -24,7 +24,11 @@ public class PushServiceApplicationTests extends BaseTest {
     @Test
     public void contextLoads() {
 
-        final String postUrl = "http://60.208.86.203:28051";
+//        final String postUrl = "http://60.208.86.203:28051";
+        final String postUrl = "http://127.0.0.1:8089/my/index";
+
+        String page = "1";
+        int pageSize = 10;
 
         //实例化索引服务
         IndexQuery indexQuery = new IndexQuery();
@@ -35,16 +39,17 @@ public class PushServiceApplicationTests extends BaseTest {
         String rule = "(*:* AND postdate:[2015-11-01T00:00:00.000Z TO 2015-11-01T23:59:59.999Z])";
         QueryString queryString = new QueryString();
         queryString.setQueryStr(rule);
-        /**
-         * order是排序方式
-         * page是第几页
-         * pageSize是一次取10条数据（如果想要这天全部的数据，有两种方法：
-         * 1、比如5000条，就把10改成10000，只要大于当天数据量即可，如果一次性取出的数据太大，这个方式不合适容易报错；
-         * 2、模拟翻页，把page和pageSize设置成变量，判断下面的list是否为空，如为空则数据取完）
-         *
-         */
-        String page = "1";
-        int pageSize = 10;
+        ArrayList<HashMap<String, String>> list = getList(postUrl, page, pageSize, indexQuery, queryString);
+        Integer pageInt = 1;
+        while (list.size() != 0) {
+            pageInt++;
+            list = getList(postUrl, String.valueOf(pageInt), pageSize, indexQuery, queryString);
+            System.out.println(" 查询第" + pageInt + "页");
+        }
+
+    }
+
+    private ArrayList<HashMap<String, String>> getList(String postUrl, String page, int pageSize, IndexQuery indexQuery, QueryString queryString) {
         String order = "date asc";
         HashMap<String, Serializable> hashMap = indexQuery.QueryPageByString(queryString, new String[]{}, order, page, pageSize);
         /**
@@ -156,10 +161,11 @@ public class PushServiceApplicationTests extends BaseTest {
             bodyInfo.put("Nounnum", null);
             bodyInfo.put("KeywordPOS", null);
             params.put("body", bodyInfo.toJSONString());
-            System.out.println(JSONObject.toJSON(params));
+            System.out.println(JSONObject.toJSONString(params));
             String msg = HttpClientUtil.getInstance().httpPost(postUrl, params);
             System.out.println("msg = " + msg);
         }
+        return list;
     }
 
 }
