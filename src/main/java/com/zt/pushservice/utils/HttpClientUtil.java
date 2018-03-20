@@ -75,7 +75,7 @@ public class HttpClientUtil {
             httpClient = getHttpClient();
             HttpPost httpPost = new HttpPost(url);
             httpPost.setConfig(requestConfig);
-            httpPost.setHeader(new BasicHeader("Content-Type", "application/json; charset=" + charset));
+            httpPost.setHeader(new BasicHeader("Content-Type", "application/x-www-form-urlencoded; charset=" + charset));
             HttpEntity paramEntity = new UrlEncodedFormEntity(parameters, charset);
             httpPost.setEntity(paramEntity);
             // 执行请求访问

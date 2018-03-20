@@ -15,9 +15,10 @@ import javax.servlet.http.HttpServletRequest;
 public class MyController {
 
     @RequestMapping("index")
-    public String index(HttpServletRequest request){
+    public String index(HttpServletRequest request,@RequestParam String body){
         String req = request.getParameter("body");
         System.out.println("req = " + req);
+        System.out.println("body = " + body);
         return "success";
     }
 }

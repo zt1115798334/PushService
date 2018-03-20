@@ -162,7 +162,10 @@ public class PushServiceApplicationTests extends BaseTest {
             bodyInfo.put("KeywordPOS", null);
             params.put("body", bodyInfo.toJSONString());
             System.out.println(JSONObject.toJSONString(params));
-            String msg = HttpClientUtil.getInstance().httpPost(postUrl, params);
+
+            Map<String,String> xiao = Maps.newHashMap();
+            xiao.put("body","xxx");
+            String msg = HttpClientUtil.getInstance().httpPost(postUrl, xiao);
             System.out.println("msg = " + msg);
         }
         return list;
