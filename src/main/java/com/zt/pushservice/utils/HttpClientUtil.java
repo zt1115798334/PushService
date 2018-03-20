@@ -1,11 +1,14 @@
 package com.zt.pushservice.utils;
 
+import com.alibaba.fastjson.JSON;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
@@ -14,116 +17,100 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 /**
  * @author wangjianchun
  */
 public class HttpClientUtil {
-    private HttpClientUtil() {
-
+    public static byte[] buildFlumeData(Map<String, Object> headers, List<Map<String, Object>> datas) throws IOException {
+        return buildFlumeData(headers, datas, false);
     }
 
-    private static final Logger logger = LoggerFactory.getLogger(HttpClientUtil.class);
-    private static final HttpClientUtil INSTANCE = new HttpClientUtil();
-    /**
-     * 最大尝试次数
-     */
-    private static final int MAX_RETRY = 3;
+    public static byte[] buildFlumeData(Map<String, Object> headers, List<Map<String, Object>> datas, boolean isCompress) throws IOException {
 
-    public static HttpClientUtil getInstance() {
-        return INSTANCE;
-    }
+        if (headers == null || headers.isEmpty())
+            throw new IllegalArgumentException("headers is null or empty.");
+        if (headers.get("topic") == null || "".equals(headers.get("topic")))
+            throw new IllegalArgumentException("headers.topic is null or empty.");
+        if (datas == null || datas.isEmpty())
+            throw new IllegalArgumentException("data is null or empty.");
 
-    private CloseableHttpClient getHttpClient() {
-        return HttpClients.createDefault();
-    }
-
-    public String httpPost(String url, Map<String, String> paramMap) {
-        return httpPost(url, paramMap, "UTF-8");
-    }
-
-    public String httpPost(String url, Map<String, String> paramMap, String charset) {
-        // 配置传递的参数
-        List<BasicNameValuePair> parameters = new ArrayList<>();
-        if (paramMap != null) {
-            for (String key : paramMap.keySet()) {
-                parameters.add(new BasicNameValuePair(key, paramMap.get(key) + ""));
-            }
+        List<Object> ldata = new ArrayList<>();
+        for (Map<String, Object> data : datas) {
+            Map<String, Object> $data = new HashMap<>();
+            $data.put("headers", new HashMap<>(headers));
+            $data.put("body", JSON.toJSONString(data));
+            ldata.add($data);
         }
-        parameters.add(new BasicNameValuePair("livedCode", String.valueOf(System.currentTimeMillis())));
-        return _httpPost(url, parameters, charset, 0);
+        String rs = JSON.toJSONString(ldata);
+        System.out.println("rs=" + rs);
+        return isCompress ? compress(rs) : rs.getBytes("UTF-8");
     }
 
-    /**
-     * HttpPost请求，控制尝试次数
-     *
-     * @param url
-     * @param parameters
-     * @param charset
-     * @param reTry
-     * @return
-     */
-    private String _httpPost(String url, List<BasicNameValuePair> parameters, String charset, int reTry) {
-        String result = "";
-        CloseableHttpClient httpClient = null;
+    public static byte[] compress(String str) throws IOException {
+        if (str == null || str.length() == 0) {
+            return null;
+        }
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        GZIPOutputStream gzip = new GZIPOutputStream(out);
+        gzip.write(str.getBytes("UTF-8"));
+        gzip.close();
+        return out.toByteArray();
+    }
+
+    // 解压缩
+    public static byte[] uncompress(byte[] bytes) throws IOException {
+        if (bytes == null || bytes.length == 0) {
+            return bytes;
+        }
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ByteArrayInputStream in = new ByteArrayInputStream(bytes);
+        GZIPInputStream gunzip = new GZIPInputStream(in);
+        byte[] buffer = new byte[256];
+        int n;
+        while ((n = gunzip.read(buffer)) >= 0) {
+            out.write(buffer, 0, n);
+        }
+        return out.toByteArray();
+    }
+
+    public static String getResult(HttpRequestBase request) {
+
+        CloseableHttpClient httpClient = HttpClients.createDefault();
         CloseableHttpResponse response = null;
+
         try {
-            httpClient = getHttpClient();
-            HttpPost httpPost = new HttpPost(url);
-            httpPost.setConfig(requestConfig);
-            httpPost.setHeader(new BasicHeader("Content-Type", "application/x-www-form-urlencoded; charset=" + charset));
-            HttpEntity paramEntity = new UrlEncodedFormEntity(parameters, charset);
-            httpPost.setEntity(paramEntity);
-            // 执行请求访问
-            response = httpClient.execute(httpPost);
-            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+            response = httpClient.execute(request);
+            if (response.getStatusLine().getStatusCode() == 200) {
+                System.out.println("发送成功啦");
                 HttpEntity entity = response.getEntity();
                 if (entity != null) {
-                    result = EntityUtils.toString(entity);
+                    String result = EntityUtils.toString(entity);
+                    return result;
                 }
-            } else if (response.getStatusLine().getStatusCode() == HttpStatus.SC_MOVED_TEMPORARILY) {
-                // 302
-                logger.error("访问地址已经改变请更新访问地址");
-            } else {
-                logger.error("操作失败，Request URL：{}, params：{}", url, parameters.toString());
             }
-        } catch (Exception e) {
-            if (reTry < MAX_RETRY) {
-                reTry++;
-                logger.error("请求失败，尝试再次请求：{},Request URL：{}, params：{}", reTry, url, parameters.toString());
-                return _httpPost(url, parameters, charset, reTry);
-            } else {
-                logger.error("请求异常，已超出最大尝试次数：{}，Request URL：{}, params：{},Exceptipn:{}", MAX_RETRY, url, parameters.toString(), e);
-            }
+            return "error";
+        } catch(ClientProtocolException e) {
+            e.printStackTrace();
+        } catch(IOException e) {
+            e.printStackTrace();
         } finally {
             try {
-                if (response != null) {
-                    response.close();
-                }
-            } catch (IOException e) {
+                response.close();
+            } catch(IOException e) {
                 e.printStackTrace();
             }
-            try {
-                if (httpClient != null) {
-                    httpClient.close();
-                }
-            } catch (IOException e) {
-                logger.error("关闭httpclient连接出错，异常信息：{}", e);
-            }
         }
-        return result;
+        return "";
     }
-
-    private static RequestConfig requestConfig = RequestConfig
-            .custom()
-            .setConnectTimeout(15000) // 设置连接超时时间
-            .setConnectionRequestTimeout(30000) // 设置请求超时时间
-            .setSocketTimeout(60000)// 设置读数据超时时间(单位毫秒)
-            .setRedirectsEnabled(true)// 默认允许自动重定向
-            .build();
 
 }
