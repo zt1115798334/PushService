@@ -51,12 +51,13 @@ public class MyTest {
 
 
         Date currentDate = DateUtils.currentDate();
-        Date startDate = DateUtils.getStartDateTimeOfDay(currentDate);
-        Date endDate = DateUtils.getEndDateTimeOfDay(currentDate);
+        Date startDate = DateUtils.currentDateAddMinute(-10,currentDate);
         String startTime = DateUtils.formatDate(startDate,DateUtils.GREENWICH_DATE_FORMAT);
-        String endTime = DateUtils.formatDate(endDate,DateUtils.GREENWICH_DATE_FORMAT);
+        String endTime = DateUtils.formatDate(currentDate,DateUtils.GREENWICH_DATE_FORMAT);
         System.out.println("startTime = " + startTime);
-        System.out.println("endDate = " + endTime);
+        System.out.println("startTime = " + endTime);
+        System.out.println("startTime = " + DateUtils.formatDate(startDate,DateUtils.DATE_SECOND_FORMAT));
+        System.out.println("endDate = " + DateUtils.formatDate(currentDate,DateUtils.DATE_SECOND_FORMAT));
 
     }
 

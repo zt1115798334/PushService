@@ -157,4 +157,31 @@ public class DateUtils {
 
         return result;
     }
+
+    /**
+     * <p>Description: 获取当前时期前后分钟的日期</p>
+     *
+     * @param minute
+     * @return
+     * @author zhangtong
+     * @date 2017年6月21日
+     */
+    public static Date currentDateAddMinute(Integer minute) {
+        DateTime dateTime = new DateTime();
+        return dateTime.plusMillis(minute).toDate();
+    }
+
+    /**
+     * <p>Description: 获取当前时期前后分钟的日期</p>
+     *
+     * @param minute
+     * @param date
+     * @return
+     * @author zhangtong
+     * @date 2017年6月21日
+     */
+    public static Date currentDateAddMinute(Integer minute, Date date) {
+        DateTime dateTime = new DateTime(date);
+        return dateTime.plusMinutes(minute).toDate();
+    }
 }
