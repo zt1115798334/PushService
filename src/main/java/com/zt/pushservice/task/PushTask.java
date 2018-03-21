@@ -47,6 +47,8 @@ public class PushTask {
         String endTime = DateUtils.formatDate(currentDate, DateUtils.GREENWICH_DATE_FORMAT);
         logger.info("查询开始时间： " + startTime + ",到结束时间：" + endTime);
         String rule = "(*:* AND postdate:[" + startTime + " TO " + endTime + "])";
+//        String rule="(*:* AND postdate:[2015-11-01T00:00:00.000Z TO 2015-11-01T23:59:59.999Z])";
+
         QueryString queryString = new QueryString();
         queryString.setQueryStr(rule);
         ArrayList<HashMap<String, String>> list = sendData.getList(postUrl, page, pageSize, indexQuery, queryString);

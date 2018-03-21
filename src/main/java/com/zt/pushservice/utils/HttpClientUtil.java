@@ -2,20 +2,13 @@ package com.zt.pushservice.utils;
 
 import com.alibaba.fastjson.JSON;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -31,6 +24,8 @@ import java.util.zip.GZIPOutputStream;
  * @author wangjianchun
  */
 public class HttpClientUtil {
+    private static final Logger logger = Logger.getLogger(HttpClientUtil.class);
+
     public static byte[] buildFlumeData(Map<String, Object> headers, List<Map<String, Object>> datas) throws IOException {
         return buildFlumeData(headers, datas, false);
     }
@@ -52,7 +47,6 @@ public class HttpClientUtil {
             ldata.add($data);
         }
         String rs = JSON.toJSONString(ldata);
-        System.out.println("rs=" + rs);
         return isCompress ? compress(rs) : rs.getBytes("UTF-8");
     }
 
@@ -91,7 +85,7 @@ public class HttpClientUtil {
         try {
             response = httpClient.execute(request);
             if (response.getStatusLine().getStatusCode() == 200) {
-                System.out.println("发送成功啦");
+                logger.info("发送成功啦");
                 HttpEntity entity = response.getEntity();
                 if (entity != null) {
                     String result = EntityUtils.toString(entity);
