@@ -1,6 +1,7 @@
 package com.zt.pushservice.task;
 
 import com.zkdj.search.fielditem.QueryString;
+import com.zt.pushservice.bean.MyBean;
 import com.zt.pushservice.solr.IndexQuery;
 import com.zt.pushservice.utils.DateUtils;
 import com.zt.pushservice.utils.SendData;
@@ -24,19 +25,23 @@ import java.util.HashMap;
 public class PushTask {
     private static final Logger logger = Logger.getLogger(PushTask.class);
 
+    private MyBean myBean = new MyBean();
+
     @Autowired
     private SendData sendData;
+
+    //实例化索引服务
+    @Autowired
+    IndexQuery indexQuery;
 
     @Scheduled(fixedDelay = 1000 * 60 * 10)
     public void execute() throws IOException {
         System.out.println("开始执行定时器");
-        final String postUrl = "http://60.208.86.203:28051";
+        final String postUrl = myBean.getPushUrl();
 
         String page = "1";
         int pageSize = 10;
 
-        //实例化索引服务
-        IndexQuery indexQuery = new IndexQuery();
         /**
          * rule自定义规则
          * 此规则意思2015-11-01一天数据的规则

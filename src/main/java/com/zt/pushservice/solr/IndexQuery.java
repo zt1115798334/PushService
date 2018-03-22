@@ -8,8 +8,11 @@ import com.zkdj.search.group.SearchByGroup;
 import com.zkdj.search.mltdoc.MltDocsById;
 import com.zkdj.search.query.QueryById;
 import com.zkdj.search.spread.SpreadByOriginal;
+import com.zt.pushservice.bean.MyBean;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.response.FacetField.Count;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -21,11 +24,13 @@ import java.util.HashMap;
  * @author zkdj
  */
 
+@Component
 public class IndexQuery  {
-	private static final Logger logger = Logger
-			.getLogger(IndexQuery.class);
 
-	private IndexServer indexServer=new IndexServer("http://183.245.203.10:8081/index-master/","3");
+	private static final Logger logger = Logger.getLogger(IndexQuery.class);
+
+	@Autowired
+	private IndexServer indexServer;
 
 	/**
 	 * 获取某篇文章的信息
