@@ -1,6 +1,7 @@
 package com.zt.pushservice.utils;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.solr.common.util.DateUtil;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -184,4 +185,28 @@ public class DateUtils {
         DateTime dateTime = new DateTime(date);
         return dateTime.plusMinutes(minute).toDate();
     }
+
+    /**
+     * <p>Description: 获取当前时期前后小时的日期</p>
+     *
+     * @param hours
+     * @param date
+     * @return
+     * @author zhangtong
+     * @date 2017年6月21日
+     */
+    public static Date currentDateAddHour(Integer hours, Date date) {
+        DateTime dateTime = new DateTime(date);
+        return dateTime.plusHours(hours).toDate();
+    }
+
+    public static Date dateReturnToZero(Date date){
+        DateTime dateTime = new DateTime(date);
+        return dateTime.millisOfDay().withMinimumValue().plusHours(dateTime.getHourOfDay()).toDate();
+    }
+
+//    public static void main(String[] args) {
+//        Date currentDate = DateUtils.currentDate();
+//        System.out.println(DateUtils.formatDate(DateUtils.dateReturnToZero(currentDate),DateUtils.DATE_SECOND_FORMAT));
+//    }
 }

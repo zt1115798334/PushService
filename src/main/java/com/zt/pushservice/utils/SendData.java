@@ -42,15 +42,13 @@ public class SendData {
         long timestampL = System.currentTimeMillis();
 
         Map<String, Object> headers = new HashMap<>();
-        headers.put("topic", "test");
+        headers.put("topic", "article");
         headers.put("timestamp", timestampL);
 
 
         List<Map<String, Object>> datas = Lists.newArrayList();
 
         if (list.size() > 0) {
-
-
             for (int i = 0; i < list.size(); i++) {
                 String id = GETuuid.getId();
                 data = list.get(i);
@@ -104,49 +102,50 @@ public class SendData {
                 bodyInfo.put("Title", title);
                 bodyInfo.put("Content", body);
                 bodyInfo.put("Author", author);
-                bodyInfo.put("From", null);
+                bodyInfo.put("From", "");
                 bodyInfo.put("Time", date.getTime());
-                bodyInfo.put("Tag", null);
-                bodyInfo.put("Images", null);
-                bodyInfo.put("ImageUrl", null);
+                bodyInfo.put("Tag", "");
+                bodyInfo.put("Images", "");
+                bodyInfo.put("ImageUrl", "");
                 bodyInfo.put("Comments", reply);
                 bodyInfo.put("Views", clink);
-                bodyInfo.put("Praises", null);
-                bodyInfo.put("Place", null);
-                bodyInfo.put("Person", null);
+                bodyInfo.put("Praises", "");
+                bodyInfo.put("Place", "");
+                bodyInfo.put("Person", "");
                 bodyInfo.put("Keyword", aboutKeywords);
-                bodyInfo.put("Hash", null);
-                bodyInfo.put("ParagraphHash", null);
-                bodyInfo.put("Segment", null);
-                bodyInfo.put("TitleSegment", null);
-                bodyInfo.put("TaskID", null);
-                bodyInfo.put("TaskName", null);
-                bodyInfo.put("GroupID", null);
-                bodyInfo.put("GroupName", null);
-                bodyInfo.put("SiteID", null);
-                bodyInfo.put("Country", null);
-                bodyInfo.put("Language", null);
-                bodyInfo.put("SiteType", null);
-                bodyInfo.put("Channel", null);
-                bodyInfo.put("DefinedType", null);
+                bodyInfo.put("Hash", "");
+                bodyInfo.put("ParagraphHash", "");
+                bodyInfo.put("Segment", "");
+                bodyInfo.put("TitleSegment", "");
+                bodyInfo.put("TaskID", "");
+                bodyInfo.put("TaskName", "");
+                bodyInfo.put("GroupID", "");
+                bodyInfo.put("GroupName", "");
+                bodyInfo.put("SiteID", "");
+                bodyInfo.put("Country", "");
+                bodyInfo.put("Language", "");
+                bodyInfo.put("SiteType", "");
+                bodyInfo.put("Channel", "");
+                bodyInfo.put("DefinedType", "");
                 bodyInfo.put("DefinedSite", definedSite);
-                bodyInfo.put("PR", null);
-                bodyInfo.put("Headline", null);
-                bodyInfo.put("Overseas", null);
-                bodyInfo.put("TopicID", null);
-                bodyInfo.put("HotChannel", null);
-                bodyInfo.put("AddOn", null);
-                bodyInfo.put("CustomerID", null);
-                bodyInfo.put("SChannel", null);
-                bodyInfo.put("SCatagory", null);
-                bodyInfo.put("Continent", null);
-                bodyInfo.put("Tissue", null);
-                bodyInfo.put("IsTopic", null);
-                bodyInfo.put("Pure", null);
-                bodyInfo.put("Pureadj", null);
-                bodyInfo.put("Pun", null);
-                bodyInfo.put("Nounnum", null);
-                bodyInfo.put("KeywordPOS", null);
+                bodyInfo.put("PR", "");
+                bodyInfo.put("Headline", "");
+                bodyInfo.put("Overseas", "");
+                bodyInfo.put("TopicID", "");
+                bodyInfo.put("HotChannel", "");
+                bodyInfo.put("AddOn", "");
+                bodyInfo.put("CustomerID", "");
+                bodyInfo.put("SChannel", "");
+                bodyInfo.put("SCatagory", "");
+                bodyInfo.put("Continent", "");
+                bodyInfo.put("Tissue", "");
+                bodyInfo.put("IsTopic", "");
+                bodyInfo.put("Pure", "");
+                bodyInfo.put("Pureadj", "");
+                bodyInfo.put("Pun", "");
+                bodyInfo.put("Nounnum", "");
+                bodyInfo.put("KeywordPOS", "");
+                bodyInfo.put("postdate", postdate);
                 datas.add(bodyInfo);
             }
             if (datas != null && datas.size() > 0) {

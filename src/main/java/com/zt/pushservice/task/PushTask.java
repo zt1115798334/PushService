@@ -34,33 +34,43 @@ public class PushTask {
     @Autowired
     IndexQuery indexQuery;
 
-    @Scheduled(fixedDelay = 1000 * 60 * 10)
+    @Scheduled(fixedDelay = 1000 * 60 * 60 * 6)
     public void execute() throws IOException {
         System.out.println("开始执行定时器");
         final String postUrl = myBean.getPushUrl();
 
+        System.out.println("postUrl = " + postUrl);
         String page = "1";
         int pageSize = 10;
+
 
         /**
          * rule自定义规则
          * 此规则意思2015-11-01一天数据的规则
          */
         Date currentDate = DateUtils.currentDate();
-        Date startDate = DateUtils.currentDateAddMinute(-10, currentDate);
-        String startTime = DateUtils.formatDate(startDate, DateUtils.GREENWICH_DATE_FORMAT);
-        String endTime = DateUtils.formatDate(currentDate, DateUtils.GREENWICH_DATE_FORMAT);
-        logger.info("查询开始时间： " + startTime + ",到结束时间：" + endTime);
-        String rule = "(*:* AND postdate:[" + startTime + " TO " + endTime + "])";
-//        String rule="(*:* AND postdate:[2015-11-01T00:00:00.000Z TO 2015-11-01T23:59:59.999Z])";
+        Date startDate = DateUtils.currentDateAddHour(-12, currentDate);
 
+        Date currentDateToZero = DateUtils.dateReturnToZero(currentDate);
+        Date startDateToZero = DateUtils.dateReturnToZero(startDate);
+        String startTime = DateUtils.formatDate(startDateToZero, DateUtils.GREENWICH_DATE_FORMAT);
+        String endTime = DateUtils.formatDate(currentDateToZero, DateUtils.GREENWICH_DATE_FORMAT);
+
+        String startTimeStr = DateUtils.formatDate(startDateToZero, DateUtils.DATE_SECOND_FORMAT);
+        String endTimeStr = DateUtils.formatDate(currentDateToZero, DateUtils.DATE_SECOND_FORMAT);
+
+        logger.info("查询开始时间： " + startTimeStr + ",到结束时间：" + endTimeStr);
+        String rule = "(*:* AND postdate:[" + startTime + " TO " + endTime + "])";
+//        String rule = "(*:* AND postdate:[2015-11-01T00:00:00.000Z TO 2015-11-01T23:59:59.999Z])";
         QueryString queryString = new QueryString();
         queryString.setQueryStr(rule);
         ArrayList<HashMap<String, String>> list = sendData.getList(postUrl, page, pageSize, indexQuery, queryString);
+        logger.info("list size: " + list.size());
         Integer pageInt = 1;
         while (list.size() != 0) {
             pageInt++;
             list = sendData.getList(postUrl, String.valueOf(pageInt), pageSize, indexQuery, queryString);
+            logger.info("list size: " + list.size());
             logger.info(" 查询第" + pageInt + "页");
         }
     }
